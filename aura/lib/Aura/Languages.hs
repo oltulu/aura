@@ -46,6 +46,7 @@ translators = M.fromList
     , (Norwegian,  "\"chinatsun\"")
     , (Indonesia,  "\"pak tua Greg\"")
     , (Chinese,    "Kai Zhang")
+    , (Turkish,    "Cihan Alkan")
     , (Japanese,   "Onoue Takuro")
     , (Esperanto,  "Zachary Matthews")
     , (Dutch,      "Joris Blanken")
@@ -53,8 +54,9 @@ translators = M.fromList
 
 -- These need updating! Or removing...
 languageNames :: Language -> Map Language T.Text
-languageNames = M.fromList . zip [ Japanese, Polish, Croatian, Swedish, German, Spanish, Portuguese, French, Russian, Italian, Serbian, Norwegian, Indonesia, Chinese, Esperanto, Dutch ] . \case
+languageNames = M.fromList . zip [ Japanese, Turkish, Polish, Croatian, Swedish, German, Spanish, Portuguese, French, Russian, Italian, Serbian, Norwegian, Indonesia, Chinese, Esperanto, Dutch ] . \case
     Japanese   -> [ "日本語", "ポーランド語", "クロアチア語", "スウェーデン語", "ドイツ語", "スペイン語", "ポルトガル語", "フランス語", "ロシア語", "イタリア語", "セルビア語", "ノルウェー語", "インドネシア語", "中国語", "エスペラント", "オランダ語" ]
+    Turkish    -> [ "Japonca", "Türkçe", "Lehçe", "Hırvatça", "İsveççe", "Almanca", "İspanyolca", "Portekizce", "Fransızca", "Rusça", "İtalyanca", "Sırpça", "Norveççe", "Endonezce", "Çince", "Esperanto", "Hollandaca" ]
     Polish     -> [ "Japanese", "polski", "chorwacki", "szwedzki", "niemiecki", "hiszpański", "portugalski", "francuski", "rosyjski", "włoski", "serbski", "norweski", "indonezyjski", "chiński", "esperanto", "niderlandzki" ]
     Croatian   -> [ "Japanese", "poljski", "hrvatski", "švedski", "njemački", "španjolski", "portugalski", "francuski", "ruski", "talijanski", "srpski", "norveški", "Indonesian", "Chinese", "Esperanto", "Dutch" ]
     Swedish    -> [ "Japanese", "Polska", "Kroatiska", "Svenska", "Tyska", "Spanska", "Portugisiska", "Franska", "Ryska", "Italienska", "Serbiska", "Norska", "Indonesian", "Chinese", "Esperanto", "Dutch" ]
@@ -76,6 +78,7 @@ translatorMsgTitle :: Language -> Text
 translatorMsgTitle = \case
     Japanese   -> "Auraの翻訳者："
     Polish     -> "Tłumacze Aury:"
+    Turkish     -> "Aura Çevirmeni::"
     Croatian   -> "Aura Prevoditelji:"
     Swedish    -> "Aura Översättare:"
     German     -> "Aura Übersetzer:"
@@ -112,6 +115,7 @@ whitespace _        = ' '   -- \32
 langFromLocale :: Text -> Maybe Language
 langFromLocale = T.take 2 >>> \case
   "ja" -> Just Japanese
+  "tr" -> Just Turkish
   "pl" -> Just Polish
   "hr" -> Just Croatian
   "sv" -> Just Swedish
@@ -138,6 +142,7 @@ checkDBLock_1 :: Language -> Doc AnsiStyle
 checkDBLock_1 = \case
     Japanese   -> "パッケージデータベースが閉鎖されている状態です。開放したらキーを押して続行してください。"
     Polish     -> "Baza pakietów jest zablokowana. Kiedy zostanie odblokowana naciśnij enter aby kontynuować"
+    Turkish    -> "Paket veritabanı kilitlendi. Devam etmek için kilidi açıldığında enter tuşuna basın."
     Croatian   -> "Baza paketa je zaključana. Kad se otključa, pritisnite enter da biste nastavili."
     German     -> "Die Paketdatenbank ist gesperrt. Drücken Sie Enter wenn sie entsperrt ist um fortzufahren."
     Spanish    -> "La base de datos de paquetes está bloqueada. Presiona enter cuando esté desbloqueada para continuar."
@@ -156,6 +161,7 @@ trueRoot_3 :: Language -> Doc AnsiStyle
 trueRoot_3 = \case
     Japanese   -> "「root」としてパッケージを作成するのは「makepkg v4.2」で不可能になりました。"
     Polish     -> "Od makepkg v4.2, budowanie jako root nie jest dozwolone."
+    Turkish    -> "Makepkg v4.2'den itibaren, kök olarak oluşturmak artık mümkün değildir."
     German     -> "Seit makepkg v4.2 ist es nicht mehr möglich als root zu bauen."
     Spanish    -> "Desde makepkg v4.2 no es posible compilar paquetes como root."
     Portuguese -> "A partir da versão v4.2 de makepkg, não é mais possível compilar como root."
@@ -171,6 +177,7 @@ mustBeRoot_1 :: Language -> Doc AnsiStyle
 mustBeRoot_1 = let sudo = bt @Text "sudo" in \case
     Japanese   -> sudo <> "を使わないとそれができない！"
     Polish     -> "Musisz użyć " <> sudo <> ", żeby to zrobić."
+    Turkish    -> "Sudo kullanmadan bu işlemi gerçekleştiremezsiniz."
     Croatian   -> "Morate koristiti" <> sudo <> "za ovu radnju."
     Swedish    -> "Du måste använda " <> sudo <> " för det."
     German     -> "Sie müssen dafür " <> sudo <> " benutzen."
@@ -193,6 +200,7 @@ mustBeRoot_1 = let sudo = bt @Text "sudo" in \case
 buildPackages_1 :: PkgName -> Language -> Doc AnsiStyle
 buildPackages_1 (bt . pnName -> p) = \case
     Japanese   -> p <> "を作成中・・・"
+    Turkish    -> "İnşa ediliyor " <> p <> "..."
     Polish     -> "Budowanie " <> p <> "..."
     Croatian   -> "Gradim " <> p <> "..."
     Swedish    -> "Bygger paket " <> p <> "..."
@@ -213,12 +221,14 @@ buildPackages_1 (bt . pnName -> p) = \case
 buildPackages_2 :: Language -> Doc AnsiStyle
 buildPackages_2 = \case
     Polish     -> "'--allsource' wykryte. Nie zostaną zbudowane żadne pakiety."
+    Turkish    -> "'--allsource' bulundu. Yüklenebilir gerçek paketler oluşturulmayacaktır."
     Spanish    -> "'--allsource' detectado. No se construirán paquetes instalables reales."
     _          -> "'--allsource' detected. No actual installable packages will be built."
 
 buildPackages_3 :: FilePath -> Language -> Doc AnsiStyle
 buildPackages_3 fp = \case
     Polish     -> "Wszystkie pliki .src.tar.gz zostały zbudowane i przekopiowane do: " <> pretty fp
+    Turkish    -> "Tüm .src.tar.gz dosyaları oluşturuldu ve şuraya kopyalandı: " <> pretty fp
     Spanish    -> "Todos los archivos .src.tar.gz fueron construidos y copiados a: " <> pretty fp
     _          -> "All .src.tar.gz files were built and copied to: " <> pretty fp
 
@@ -497,6 +507,7 @@ install_2 = \case
 install_3 :: Language -> Doc AnsiStyle
 install_3 = \case
     Japanese   -> "続行しますか？"
+    Turkish    -> "Devam edilsin mi?"
     Polish     -> "Kontynuować?"
     Croatian   -> "Nastaviti?"
     Swedish    -> "Fortsätta?"
@@ -631,6 +642,7 @@ reportPkgsToInstall_2 :: Language -> Doc AnsiStyle
 reportPkgsToInstall_2 = \case
     Japanese   -> "AURのパッケージ:"
     Polish     -> "Pakiety AUR:"
+    Turkish    -> "AUR Paketleri:"
     Croatian   -> "AUR Paketi:"
     German     -> "AUR Pakete:"
     Spanish    -> "AUR Paquetes:"
@@ -1068,6 +1080,7 @@ copyAndNotify_1 :: Int -> Language -> Doc AnsiStyle
 copyAndNotify_1 (cyan . pretty -> n) = \case
     Japanese   -> "#[" <> n <> "]をコピー中・・・"
     Polish     -> "Kopiowanie #[" <> n <> "]"
+    Turkish    -> "Kopyalanıyor #[" <> n <> "]"
     Croatian   -> "Kopiranje #[" <> n <> "]"
     Swedish    -> "Kopierar #[" <> n <> "]"
     German     -> "Kopiere #[" <> n <> "]"
@@ -1643,6 +1656,7 @@ security_14 = \case
 yesNoMessage :: Language -> Doc ann
 yesNoMessage = \case
     Polish     -> "[T/n]"
+    Turkish    -> "[e/h]"
     Croatian   -> "[D/n]"
     German     -> "[J/n]"
     Spanish    -> "[S/n]"
@@ -1658,6 +1672,7 @@ yesNoMessage = \case
 yesPattern :: Language -> [T.Text]
 yesPattern lang = map T.toCaseFold $ case lang of
     Polish     -> ["t", "tak"]
+    Turkish    -> ["e", "evet"]
     Croatian   -> ["d", "da"]
     German     -> ["j", "ja"]
     Spanish    -> ["s", "si"]
